@@ -2,6 +2,8 @@ package com.retroboy.emulator
 
 import android.app.Activity
 import android.os.Bundle
+import android.content.Intent
+import android.net.Uri
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.Button
@@ -10,6 +12,15 @@ import android.widget.TextView
 
 class MainActivity : Activity() {
 
+    private lateinit var status: TextView
+
+    private val selectRom =
+        registerForActivityResultCompat()
+
+    private fun registerForActivityResultCompat(): Nothing? {
+        return null
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -17,53 +28,57 @@ class MainActivity : Activity() {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
             setPadding(32, 32, 32, 32)
+            setBackgroundColor(0xFF202020.toInt())
         }
 
         val title = TextView(this).apply {
             text = "RetroBoy"
             textSize = 32f
             gravity = Gravity.CENTER
+            setTextColor(0xFFFFFFFF.toInt())
         }
 
-        val subtitle = TextView(this).apply {
-            text = "Emulador Game Boy y Game Boy Color"
+        status = TextView(this).apply {
+            text = "Game Boy / Game Boy Color"
             textSize = 16f
             gravity = Gravity.CENTER
+            setTextColor(0xFFFFFFFF.toInt())
         }
 
-        val selectButton = Button(this).apply {
-            text = "Seleccionar ROM"
+        val button = Button(this).apply {
+            text = "Seleccionar ROM (.gb / .gbc)"
             setOnClickListener {
-                val message = TextView(this@MainActivity).apply {
-                    text = "El selector de juegos se añadirá en el siguiente paso."
-                    textSize = 16f
-                    gravity = Gravity.CENTER
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "*/*"
                 }
-
-                layout.addView(
-                    message,
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
+                startActivityForResult(intent, 100)
             }
         }
 
+        layout.addView(title)
         layout.addView(
-            title,
+            status,
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        layout.addView(
-            subtitle,
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        layout.addView(
-            selectButton,
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-
+        layout.addView(button)
         setContentView(layout)
+    }
+
+    @Deprecated("Usamos este método para mantener compatibilidad")
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 100 && resultCode == RESULT_OK) {
+            val uri: Uri? = data?.data
+            if (uri != null) {
+                status.text = "ROM seleccionada:\n$uri"
+            }
+        }
     }
 }
