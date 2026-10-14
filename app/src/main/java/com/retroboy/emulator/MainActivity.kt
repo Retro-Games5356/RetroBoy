@@ -168,13 +168,41 @@ class MainActivity : Activity() {
 
                     val button = Button(this).apply {
                         text = name
-                        setOnClickListener {
-                            status.text = "Juego seleccionado:\n$name"
-                            Toast.makeText(
-                                this@MainActivity,
-                                "El motor de emulación se integrará a continuación",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                        
+setOnClickListener {
+    status.text = "Cargando ROM...\n$name"
+
+    try {
+        val cartridge = CartridgeLoader.load(
+            contentResolver,
+            fileUri
+        )
+
+        val mode = if (cartridge.isColor) {
+            "Game Boy Color"
+        } else {
+            "Game Boy"
+        }
+
+        status.text = """
+            ROM cargada correctamente
+
+            Juego: ${cartridge.title}
+            Archivo: $name
+            Sistema: $mode
+            Tipo de cartucho: 0x${
+                cartridge.cartridgeType.toString(16).uppercase()
+            }
+            Tamaño leído: ${cartridge.actualSizeBytes} bytes
+            Tamaño declarado: ${cartridge.romSizeBytes} bytes
+
+            Próximo paso: CPU del emulador.
+        """.trimIndent()
+    } catch (e: Exception) {
+        status.text = "Error al cargar la ROM:\n${e.message}"
+    }
+}
+
                         }
                     }
 
