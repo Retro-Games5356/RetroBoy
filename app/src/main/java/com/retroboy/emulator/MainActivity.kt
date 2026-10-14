@@ -167,47 +167,46 @@ class MainActivity : Activity() {
                         DocumentsContract.buildDocumentUriUsingTree(treeUri, id)
 
                     val button = Button(this).apply {
-                        text = name
-                        
-setOnClickListener {
-    status.text = "Cargando ROM...\n$name"
+    text = name
 
-    try {
-        val cartridge = CartridgeLoader.load(
-            contentResolver,
-            fileUri
-        )
+    setOnClickListener {
+        status.text = "Cargando ROM...\n$name"
 
-        val mode = if (cartridge.isColor) {
-            "Game Boy Color"
-        } else {
-            "Game Boy"
-        }
+        try {
+            val cartridge = CartridgeLoader.load(
+                contentResolver,
+                fileUri
+            )
 
-        status.text = """
-            ROM cargada correctamente
-
-            Juego: ${cartridge.title}
-            Archivo: $name
-            Sistema: $mode
-            Tipo de cartucho: 0x${
-                cartridge.cartridgeType.toString(16).uppercase()
+            val mode = if (cartridge.isColor) {
+                "Game Boy Color"
+            } else {
+                "Game Boy"
             }
-            Tamaño leído: ${cartridge.actualSizeBytes} bytes
-            Tamaño declarado: ${cartridge.romSizeBytes} bytes
 
-            Próximo paso: CPU del emulador.
-        """.trimIndent()
-    } catch (e: Exception) {
-        status.text = "Error al cargar la ROM:\n${e.message}"
+            status.text = """
+                ROM cargada correctamente
+
+                Juego: ${cartridge.title}
+                Archivo: $name
+                Sistema: $mode
+                Tipo de cartucho: 0x${
+                    cartridge.cartridgeType.toString(16).uppercase()
+                }
+                Tamaño leído: ${cartridge.actualSizeBytes} bytes
+                Tamaño declarado: ${cartridge.romSizeBytes} bytes
+
+                Próximo paso: CPU del emulador.
+            """.trimIndent()
+
+        } catch (e: Exception) {
+            status.text = "Error al cargar la ROM:\n${e.message}"
+        }
     }
 }
 
-                        }
-                    }
-
-                    gamesList.addView(button)
-                    count++
+gamesList.addView(button)
+count++
                 }
             }
         }
