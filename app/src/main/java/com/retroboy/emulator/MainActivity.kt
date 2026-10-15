@@ -170,7 +170,7 @@ class MainActivity : Activity() {
     text = name
 
     setOnClickListener {
-        status.text = "Cargando ROM...\n$name"
+    status.text = "Juego seleccionado:\n$name"
 
         try {
             val cartridge = CartridgeLoader.load(
